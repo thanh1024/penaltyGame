@@ -3,37 +3,84 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="client.GUI.GameRoomController">
+            fx:controller="client.GUI.GameRoomController"
+            style="-fx-background-color: linear-gradient(to bottom, #1a472a, #0d2818);">
     <top>
-        <VBox alignment="CENTER" spacing="5" style="-fx-background-color: lightgray;">
-            <Label fx:id="scoreLabel" text="Tỷ số: 0 - 0" style="-fx-font-size: 18px; -fx-text-fill: black;"/>
-            <Label fx:id="timerLabel" text="Thời gian còn lại: 15 giây" style="-fx-font-size: 16px; -fx-text-fill: red;"/>
+        <!-- Score and Timer Header -->
+        <VBox alignment="CENTER" spacing="8" style="-fx-background-color: linear-gradient(to bottom, #2d5a3d, #1e3a28); -fx-padding: 15; -fx-border-color: #3d7a4d; -fx-border-width: 0 0 3 0;">
+            <Label text="⚽ PENALTY SHOOTOUT ⚽" style="-fx-font-size: 20px; -fx-text-fill: #ffd700; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 8, 0, 0, 2);"/>
+            
+            <HBox alignment="CENTER" spacing="30">
+                <VBox alignment="CENTER" spacing="3" style="-fx-background-color: rgba(0,0,0,0.4); -fx-background-radius: 10; -fx-padding: 10 20 10 20; -fx-border-color: #ffd700; -fx-border-width: 2; -fx-border-radius: 10;">
+                    <Label text="📊 TỶ SỐ" style="-fx-font-size: 12px; -fx-text-fill: #90ee90; -fx-font-weight: bold;"/>
+                    <Label fx:id="scoreLabel" text="0 - 0" style="-fx-font-size: 32px; -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(255,215,0,0.6), 10, 0, 0, 0);"/>
+                </VBox>
+                
+                <VBox alignment="CENTER" spacing="3" style="-fx-background-color: rgba(0,0,0,0.4); -fx-background-radius: 10; -fx-padding: 10 20 10 20; -fx-border-color: #ff6b35; -fx-border-width: 2; -fx-border-radius: 10;">
+                    <Label text="⏱️ THỜI GIAN" style="-fx-font-size: 12px; -fx-text-fill: #ffb6c1; -fx-font-weight: bold;"/>
+                    <Label fx:id="timerLabel" text="15 giây" style="-fx-font-size: 28px; -fx-text-fill: #ff4444; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(255,68,68,0.8), 10, 0, 0, 0);"/>
+                </VBox>
+            </HBox>
         </VBox>
     </top>
+    
     <center>
-        <Pane fx:id="gamePane" prefWidth="600" prefHeight="400">
-        </Pane>
+        <!-- Game Field with better styling -->
+        <VBox alignment="CENTER" style="-fx-background-color: #0d2818; -fx-padding: 10;">
+            <Pane fx:id="gamePane" prefWidth="700" prefHeight="500" minWidth="700" minHeight="500"
+                  style="-fx-background-color: linear-gradient(to bottom, #2e7d32, #1b5e20); -fx-border-color: #ffffff; -fx-border-width: 4; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 15, 0, 0, 5);">
+            </Pane>
+        </VBox>
     </center>
+    
     <right>
-        <VBox spacing="5" prefWidth="200">
-            <TextArea fx:id="chatArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS"/>
-            <TextField fx:id="chatInput" promptText="Nhập tin nhắn"/>
-            <Button text="Gửi" onAction="#handleSendChat"/>
+        <!-- Chat Panel -->
+        <VBox spacing="8" prefWidth="250" style="-fx-background-color: rgba(30, 58, 40, 0.9); -fx-padding: 10; -fx-border-color: #3d7a4d; -fx-border-width: 2 0 0 2;">
+            <Label text="" style="-fx-font-size: 16px; -fx-text-fill: #ffd700; -fx-font-weight: bold;"/>
+            <Separator style="-fx-background-color: #3d7a4d;"/>
+            
+            <TextArea fx:id="chatArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS"
+                      style="-fx-background-color: #1e3a28; -fx-text-fill: #ffffff; -fx-font-size: 12px; -fx-border-color: #3d7a4d; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;"/>
+            
+            <HBox spacing="5">
+                <TextField fx:id="chatInput" promptText="Nhập tin nhắn..." HBox.hgrow="ALWAYS"
+                           style="-fx-font-size: 12px;"/>
+                <Button text="📤" onAction="#handleSendChat" prefWidth="40"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            </HBox>
         </VBox>
     </right>
+    
     <bottom>
-        <HBox spacing="10" alignment="CENTER">
-            <Button fx:id="shootButton" text="Sút" onAction="#handleShoot"/>
-            <Button fx:id="goalkeeperButton" text="Chặn" onAction="#handleGoalkeeper"/>
-            <Button fx:id="quitButton" text="Thoát Trò Chơi" onAction="#handleQuitGame"/>
-        </HBox>
+        <!-- Action Buttons -->
+        <VBox spacing="10" style="-fx-background-color: linear-gradient(to top, #1e3a28, #2d5a3d); -fx-padding: 15; -fx-border-color: #3d7a4d; -fx-border-width: 3 0 0 0;">
+            <HBox spacing="15" alignment="CENTER">
+                <Button fx:id="shootButton" text="⚽ SÚT PENALTY" onAction="#handleShoot" prefWidth="200" prefHeight="50"
+                        style="-fx-font-size: 16px; -fx-background-color: linear-gradient(to bottom, #ff6b35, #ff4500); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 8, 0, 0, 3);"/>
+                
+                <Button fx:id="goalkeeperButton" text="🧤 BẮT BÓNG" onAction="#handleGoalkeeper" prefWidth="200" prefHeight="50"
+                        style="-fx-font-size: 16px; -fx-background-color: linear-gradient(to bottom, #4CAF50, #2e7d32); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 8, 0, 0, 3);"/>
+                
+                <Region HBox.hgrow="ALWAYS"/>
+                
+                <Button fx:id="quitButton" text="🚪 THOÁT" onAction="#handleQuitGame" prefWidth="120" prefHeight="50"
+                        style="-fx-font-size: 14px; -fx-background-color: linear-gradient(to bottom, #dc3545, #bd2130); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;"/>
+            </HBox>
+            
+            <HBox alignment="CENTER" spacing="15" style="-fx-background-color: rgba(0,0,0,0.3); -fx-background-radius: 8; -fx-padding: 8;">
+                <Label text="💡 Mẹo: Chọn hướng sút hoặc bắt bóng trước khi hết giờ!" 
+                       style="-fx-text-fill: #90ee90; -fx-font-style: italic; -fx-font-size: 13px;"/>
+            </HBox>
+        </VBox>
     </bottom>
 </BorderPane>

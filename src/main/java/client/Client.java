@@ -31,6 +31,7 @@ public class Client {
 
     // Controllers
     private LoginController loginController;
+    private client.GUI.RegisterController registerController;
     private MainController mainController;
     private GameRoomController gameRoomController;
 
@@ -38,6 +39,14 @@ public class Client {
 
     public Client(Stage primaryStage) {
         this.primaryStage = primaryStage;
+    }
+    
+    public void setLoginController(LoginController loginController) {
+        this.loginController = loginController;
+    }
+    
+    public void setRegisterController(client.GUI.RegisterController registerController) {
+        this.registerController = registerController;
     }
 
     public void showErrorAlert(String message) {
@@ -97,11 +106,33 @@ public class Client {
     }
 
     private void handleMessage(Message message) {
-        System.out.println("Received message: " + message.getType() + " - " + message.getContent());
+        System.out.println("[DEBUG CLIENT] Received message: " + message.getType() + " - " + message.getContent());
         if (message == null) {
             return;
         }
         switch (message.getType()) {
+            case "register_success":
+                System.out.println("[DEBUG CLIENT] Processing register_success message");
+                Platform.runLater(() -> {
+                    if (registerController != null) {
+                        System.out.println("[DEBUG CLIENT] Calling registerController.showSuccess()");
+                        registerController.showSuccess((String) message.getContent());
+                    } else {
+                        System.err.println("[ERROR CLIENT] registerController is null!");
+                    }
+                });
+                break;
+            case "register_error":
+                System.out.println("[DEBUG CLIENT] Processing register_error message");
+                Platform.runLater(() -> {
+                    if (registerController != null) {
+                        System.out.println("[DEBUG CLIENT] Calling registerController.showError()");
+                        registerController.showError((String) message.getContent());
+                    } else {
+                        System.err.println("[ERROR CLIENT] registerController is null!");
+                    }
+                });
+                break;
             case "login_success":
                 this.user = (User) message.getContent();
                 Platform.runLater(() -> showMainUI());
@@ -326,8 +357,14 @@ public class Client {
     }
 
     public void sendMessage(Message message) throws IOException {
+        System.out.println("[DEBUG CLIENT] Sending message - Type: " + message.getType());
+        if (out == null) {
+            System.err.println("[ERROR CLIENT] ObjectOutputStream is null!");
+            throw new IOException("ObjectOutputStream chưa được khởi tạo");
+        }
         out.writeObject(message);
         out.flush();
+        System.out.println("[DEBUG CLIENT] Message sent and flushed successfully");
     }
 
     public void showMainUI() {
@@ -363,6 +400,42 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
             showErrorAlert("Không thể tải giao diện chính.");
+        }
+    }
+
+    public void showRegisterUI() {
+        try {
+            System.out.println("[DEBUG] Loading RegisterUI.fxml...");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/GUI/RegisterUI.fxml"));
+            Parent root = loader.load();
+            registerController = loader.getController();
+
+            if (registerController == null) {
+                System.err.println("[ERROR] Controller is null for RegisterUI.fxml");
+                showErrorAlert("Không thể tải controller giao diện đăng ký.");
+                return;
+            }
+
+            System.out.println("[DEBUG] Setting client to RegisterController");
+            registerController.setClient(this);
+            System.out.println("[DEBUG] Client set successfully, client object: " + this);
+            
+            Scene scene = new Scene(root);
+
+            URL cssLocation = getClass().getResource("/GUI/style.css");
+            if (cssLocation != null) {
+                scene.getStylesheets().add(cssLocation.toExternalForm());
+                System.out.println("CSS file loaded: " + cssLocation.toExternalForm());
+            } else {
+                System.err.println("Cannot find CSS file: style.css");
+            }
+
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Penalty Shootout - Register");
+            primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showErrorAlert("Không thể tải giao diện đăng ký.");
         }
     }
 

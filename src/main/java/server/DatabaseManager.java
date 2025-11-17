@@ -50,6 +50,36 @@ public class DatabaseManager {
         }
     }
 
+    // Phương thức đăng ký
+    public boolean registerUser(String username, String password) throws SQLException {
+        System.out.println("[DEBUG DB] registerUser called - Username: " + username);
+        
+        // Kiểm tra xem username đã tồn tại chưa
+        String checkQuery = "SELECT * FROM users WHERE username = ?";
+        PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+        checkStmt.setString(1, username);
+        System.out.println("[DEBUG DB] Executing query to check if username exists");
+        ResultSet rs = checkStmt.executeQuery();
+        
+        if (rs.next()) {
+            // Username đã tồn tại
+            System.out.println("[DEBUG DB] Username already exists: " + username);
+            return false;
+        }
+        
+        System.out.println("[DEBUG DB] Username is available, inserting new user");
+        // Thêm user mới vào database
+        String insertQuery = "INSERT INTO users (username, password, points, status) VALUES (?, ?, 0, 'offline')";
+        PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
+        insertStmt.setString(1, username);
+        insertStmt.setString(2, password);
+        System.out.println("[DEBUG DB] Executing INSERT query");
+        int result = insertStmt.executeUpdate();
+        System.out.println("[DEBUG DB] INSERT result: " + result + " rows affected");
+        
+        return result > 0;
+    }
+    
     // Phương thức đăng nhập
     public Pair<User, Boolean> authenticate(String username, String password) throws SQLException {
         String query = "SELECT * FROM users WHERE username = ? AND password = ?";

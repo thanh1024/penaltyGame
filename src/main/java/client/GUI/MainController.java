@@ -42,6 +42,8 @@ public class MainController {
     private TableColumn<User, String> statusColumn;
     @FXML
     private Label statusLabel;
+    @FXML
+    private Menu userMenu;
 
     private Client client;
     private ObservableList<User> usersList = FXCollections.observableArrayList();
@@ -79,6 +81,12 @@ public class MainController {
 
     public void setClient(Client client) throws IOException {
         this.client = client;
+        
+        // Cập nhật tên menu thành tên người dùng
+        if (client.getUser() != null) {
+            userMenu.setText(client.getUser().getUsername());
+        }
+        
         loadUsers();
         loadLeaderboard();
         loadUserMatches(); // Tải danh sách trận đấu

@@ -5,75 +5,116 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="client.GUI.MainController">
+            fx:controller="client.GUI.MainController"
+            style="-fx-background-color: linear-gradient(to bottom, #1a472a, #0d2818);">
     <top>
-        <MenuBar>
-            <Menu text="Menu">
-                <MenuItem text="Đăng xuất" onAction="#handleLogout"/>
-            </Menu>
-        </MenuBar>
+        <VBox>
+            <!-- Menu Bar with Football Theme -->
+            <MenuBar style="-fx-background-color: linear-gradient(to bottom, #2d5a3d, #1e3a28); -fx-border-width: 0 0 3 0; -fx-border-color: #3d7a4d;">
+                <Menu fx:id="userMenu" text="Menu">
+                    <MenuItem text="Đăng xuất" onAction="#handleLogout"/>
+                </Menu>
+            </MenuBar>
+            
+            <!-- Header Section -->
+            <HBox alignment="CENTER" style="-fx-background-color: linear-gradient(to right, #2d5a3d, #3d7a4d, #2d5a3d); -fx-padding: 15;">
+                <Label text="PENALTY SHOOTOUT GAME" style="-fx-font-size: 24px; -fx-text-fill: #ffd700; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 10, 0, 0, 3);"/>
+            </HBox>
+        </VBox>
     </top>
     <center>
-        <TabPane>
-            <Tab text="Danh Sách Người Chơi">
-                <VBox spacing="10">
+        <TabPane style="-fx-background-color: transparent;">
+            <!-- Tab 1: Player List -->
+            <Tab text="Danh Sách Người Chơi" closable="false">
+                <VBox spacing="15" style="-fx-background-color: linear-gradient(to bottom, #1e3a28, #0d2818); -fx-padding: 15;">
                     <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
                     </padding>
-                    <HBox spacing="10">
-                        <TextField fx:id="searchField" promptText="Tìm kiếm theo tên"/>
-                        <Button text="Lọc Online" onAction="#handleFilterOnline"/>
-                        <Button text="Tìm" onAction="#handleSearch"/>
+                    
+                    <!-- Search Section -->
+                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-background-color: rgba(45, 90, 61, 0.5); -fx-background-radius: 10; -fx-padding: 15; -fx-border-color: #3d7a4d; -fx-border-width: 2; -fx-border-radius: 10;">
+                        <Label text="Tìm kiếm:" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <TextField fx:id="searchField" promptText="Nhập tên người chơi..." prefWidth="250" style="-fx-font-size: 13px;"/>
+                        <Button text="Lọc Online" onAction="#handleFilterOnline" style="-fx-background-color: #4CAF50;"/>
+                        <Button text="Tìm kiếm" onAction="#handleSearch"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="Click đúp để thách đấu!" style="-fx-text-fill: #90ee90; -fx-font-style: italic;"/>
                     </HBox>
-                    <TableView fx:id="usersTable">
+                    
+                    <!-- Players Table -->
+                    <TableView fx:id="usersTable" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn text="Tên" fx:id="nameColumn" prefWidth="150"/>
-                            <TableColumn text="Điểm" fx:id="pointsColumn" prefWidth="100"/>
-                            <TableColumn text="Trạng Thái" fx:id="statusColumn" prefWidth="100"/>
+                            <TableColumn text="Tên người chơi" fx:id="nameColumn" prefWidth="200"/>
+                            <TableColumn text="Điểm" fx:id="pointsColumn" prefWidth="120"/>
+                            <TableColumn text="Trạng thái" fx:id="statusColumn" prefWidth="150"/>
                         </columns>
                     </TableView>
                 </VBox>
             </Tab>
-            <Tab text="Lịch Sử Đấu">
-                <VBox spacing="10">
+            
+            <!-- Tab 2: Match History -->
+            <Tab text="Lịch Sử Đấu" closable="false">
+                <VBox spacing="15" style="-fx-background-color: linear-gradient(to bottom, #1e3a28, #0d2818); -fx-padding: 15;">
                     <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
                     </padding>
+                    
+                    <Label text="Lịch sử các trận đấu của bạn" style="-fx-font-size: 16px; -fx-text-fill: #ffd700; -fx-font-weight: bold;"/>
+                    
                     <!-- Sử dụng SplitPane để chia không gian giữa hai bảng -->
-                    <SplitPane orientation="VERTICAL">
-                        <TableView fx:id="matchesTable">
-                            <columns>
-                                <TableColumn text="Mã Trận" fx:id="matchIdColumn" prefWidth="80"/>
-                                <TableColumn text="Đối Thủ" fx:id="opponentColumn" prefWidth="150"/>
-                                <TableColumn text="Kết Quả" fx:id="matchResultColumn" prefWidth="80"/>
-                                <TableColumn text="Thời Gian" fx:id="matchTimeColumn" prefWidth="150"/>
-                            </columns>
-                        </TableView>
-                        <TableView fx:id="historyTable">
-                            <columns>
-                                <TableColumn text="Lượt" fx:id="roundColumn" prefWidth="80"/>
-                                <TableColumn text="Thời Gian" fx:id="timeColumn" prefWidth="150"/>
-                                <TableColumn text="Vai Trò" fx:id="roleColumn" prefWidth="100"/>
-                                <TableColumn text="Hướng" fx:id="directionColumn" prefWidth="100"/>
-                                <TableColumn text="Kết Quả" fx:id="historyResultColumn" prefWidth="80"/>
-                            </columns>
-                        </TableView>
+                    <SplitPane orientation="VERTICAL" VBox.vgrow="ALWAYS" dividerPositions="0.5">
+                        <VBox spacing="5">
+                            <Label text="Danh sách trận đấu" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                            <TableView fx:id="matchesTable">
+                                <columns>
+                                    <TableColumn text="Mã trận" fx:id="matchIdColumn" prefWidth="100"/>
+                                    <TableColumn text="Đối thủ" fx:id="opponentColumn" prefWidth="180"/>
+                                    <TableColumn text="Kết quả" fx:id="matchResultColumn" prefWidth="120"/>
+                                    <TableColumn text="Thời gian" fx:id="matchTimeColumn" prefWidth="180"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                        <VBox spacing="5">
+                            <Label text="Chi tiết trận đấu" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                            <TableView fx:id="historyTable">
+                                <columns>
+                                    <TableColumn text="Lượt" fx:id="roundColumn" prefWidth="80"/>
+                                    <TableColumn text="Thời gian" fx:id="timeColumn" prefWidth="160"/>
+                                    <TableColumn text="Vai trò" fx:id="roleColumn" prefWidth="120"/>
+                                    <TableColumn text="Hướng" fx:id="directionColumn" prefWidth="120"/>
+                                    <TableColumn text="Kết quả" fx:id="historyResultColumn" prefWidth="100"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
                     </SplitPane>
                 </VBox>
             </Tab>
-            <Tab text="Bảng Xếp Hạng">
-                <VBox spacing="10">
+            
+            <!-- Tab 3: Leaderboard -->
+            <Tab text="Bảng Xếp Hạng" closable="false">
+                <VBox spacing="15" style="-fx-background-color: linear-gradient(to bottom, #1e3a28, #0d2818); -fx-padding: 15;">
                     <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
                     </padding>
-                    <TableView fx:id="leaderboardTable">
+                    
+                    <HBox alignment="CENTER" style="-fx-background-color: rgba(255, 215, 0, 0.2); -fx-background-radius: 10; -fx-padding: 15; -fx-border-color: #ffd700; -fx-border-width: 2; -fx-border-radius: 10;">
+                        <Label text="TOP NHỮNG CẦU THỦ XUẤT SẮC NHẤT" style="-fx-font-size: 18px; -fx-text-fill: #ffd700; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 8, 0, 0, 2);"/>
+                    </HBox>
+                    
+                    <TableView fx:id="leaderboardTable" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn text="Tên" fx:id="lbNameColumn" prefWidth="150"/>
-                            <TableColumn text="Điểm" fx:id="lbPointsColumn" prefWidth="100"/>
-                            <TableColumn text="Bàn Thắng" fx:id="lbGoalsScoredColumn" prefWidth="100"/>
-                            <TableColumn text="Bàn Bắt" fx:id="lbGoalsSavedColumn" prefWidth="100"/>
+                            <TableColumn text="Tên cầu thủ" fx:id="lbNameColumn" prefWidth="200"/>
+                            <TableColumn text="Tổng điểm" fx:id="lbPointsColumn" prefWidth="150"/>
+                            <TableColumn text="Bàn thắng" fx:id="lbGoalsScoredColumn" prefWidth="150"/>
+                            <TableColumn text="Bàn cứu thua" fx:id="lbGoalsSavedColumn" prefWidth="150"/>
                         </columns>
                     </TableView>
+                    
+                    <HBox alignment="CENTER" spacing="20" style="-fx-background-color: rgba(45, 90, 61, 0.5); -fx-background-radius: 10; -fx-padding: 10;">
+                        <Label text="Bàn thắng: Số penalty ghi được" style="-fx-text-fill: #90ee90;"/>
+                        <Separator orientation="VERTICAL" prefHeight="20"/>
+                        <Label text="Bàn cứu: Số penalty cản phá được" style="-fx-text-fill: #90ee90;"/>
+                    </HBox>
                 </VBox>
             </Tab>
         </TabPane>

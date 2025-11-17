@@ -73,6 +73,14 @@ public class GameRoomController {
     private int lastTurnDuration = 15; // Giá trị mặc định
 
     private String yourRole = "";
+    
+    // Lưu tọa độ khung thành để sử dụng trong animation
+    private double goalX;
+    private double goalY;
+    private double goalWidth;
+    private double goalHeight;
+    private double ballStartX;
+    private double ballStartY;
 
     public void updateScore(int[] scores) {
         Platform.runLater(() -> {
@@ -123,48 +131,94 @@ public class GameRoomController {
 
         // Kiểm tra nếu kích thước chưa được khởi tạo
         if (paneWidth <= 0 || paneHeight <= 0) {
-            paneWidth = 600; // Giá trị mặc định
-            paneHeight = 400;
+            paneWidth = 700; // Giá trị mặc định tăng lên
+            paneHeight = 500;
         }
 
+        // Vẽ nền sân cỏ gradient đẹp hơn
+        Rectangle background = new Rectangle(0, 0, paneWidth, paneHeight);
+        background.setFill(Color.web("#2e7d32"));
+        gamePane.getChildren().add(background);
+
         // Vẽ sân cỏ với họa tiết sọc ngang
-        for (int i = 0; i < paneHeight; i += 20) {
-            Rectangle stripe = new Rectangle(0, i, paneWidth, 20);
-            stripe.setFill(i % 40 == 0 ? Color.DARKGREEN : Color.GREEN);
+        for (int i = 0; i < paneHeight; i += 30) {
+            Rectangle stripe = new Rectangle(0, i, paneWidth, 30);
+            if (i % 60 == 0) {
+                stripe.setFill(Color.web("#27632a"));
+            } else {
+                stripe.setFill(Color.web("#2e7d32"));
+            }
+            stripe.setOpacity(0.6);
             gamePane.getChildren().add(stripe);
         }
 
-        // Vẽ đường viền sân
+        // Vẽ đường viền sân với hiệu ứng glow
         Rectangle fieldBorder = new Rectangle(0, 0, paneWidth, paneHeight);
         fieldBorder.setFill(Color.TRANSPARENT);
         fieldBorder.setStroke(Color.WHITE);
-        fieldBorder.setStrokeWidth(2);
+        fieldBorder.setStrokeWidth(3);
         gamePane.getChildren().add(fieldBorder);
 
-        // Vẽ khung thành với cột và xà ngang
-        Rectangle goal = new Rectangle(paneWidth / 2 - 100, 15, 200, 5);
-        goal.setFill(Color.WHITE);
-        gamePane.getChildren().add(goal);
+        // Vẽ khu vực penalty (vòng cung phía dưới)
+        Arc penaltyArc = new Arc(paneWidth / 2, paneHeight - 100, 50, 50, 0, 180);
+        penaltyArc.setFill(Color.TRANSPARENT);
+        penaltyArc.setStroke(Color.WHITE);
+        penaltyArc.setStrokeWidth(2);
+        penaltyArc.setType(ArcType.OPEN);
+        gamePane.getChildren().add(penaltyArc);
 
-        Rectangle goalLeft = new Rectangle(paneWidth / 2 - 100, 15, 5, 80);
-        goalLeft.setFill(Color.WHITE);
-        gamePane.getChildren().add(goalLeft);
+        // Vẽ điểm penalty
+        Circle penaltySpot = new Circle(paneWidth / 2, paneHeight - 100, 3);
+        penaltySpot.setFill(Color.WHITE);
+        gamePane.getChildren().add(penaltySpot);
 
-        Rectangle goalRight = new Rectangle(paneWidth / 2 + 95, 15, 5, 80);
-        goalRight.setFill(Color.WHITE);
-        gamePane.getChildren().add(goalRight);
+        // === VẼ KHUNG THÀNH ĐẸP HƠN ===
+        // Lưu các giá trị để sử dụng trong animation
+        this.goalWidth = 180;
+        this.goalHeight = 100;
+        this.goalX = paneWidth / 2 - this.goalWidth / 2;
+        this.goalY = 30;
 
-        // Vẽ lưới khung thành
-        for (int i = 0; i <= 200; i += 10) {
-            Line verticalLine = new Line(paneWidth / 2 - 100 + i, 20, paneWidth / 2 - 100 + i, 80);
-            verticalLine.setStroke(Color.WHITE);
-            verticalLine.setStrokeWidth(1);
+        // Nền khung thành (để tạo độ sâu)
+        Rectangle goalBackground = new Rectangle(this.goalX - 10, this.goalY - 10, this.goalWidth + 20, this.goalHeight + 10);
+        goalBackground.setFill(Color.web("#1a1a1a"));
+        goalBackground.setOpacity(0.3);
+        gamePane.getChildren().add(goalBackground);
+
+        // Xà ngang trên
+        Rectangle goalTop = new Rectangle(this.goalX, this.goalY, this.goalWidth, 5);
+        goalTop.setFill(Color.WHITE);
+        goalTop.setStroke(Color.LIGHTGRAY);
+        goalTop.setStrokeWidth(1);
+        gamePane.getChildren().add(goalTop);
+
+        // Cột trái
+        Rectangle goalLeftPost = new Rectangle(this.goalX, this.goalY, 5, this.goalHeight);
+        goalLeftPost.setFill(Color.WHITE);
+        goalLeftPost.setStroke(Color.LIGHTGRAY);
+        goalLeftPost.setStrokeWidth(1);
+        gamePane.getChildren().add(goalLeftPost);
+
+        // Cột phải
+        Rectangle goalRightPost = new Rectangle(this.goalX + this.goalWidth - 5, this.goalY, 5, this.goalHeight);
+        goalRightPost.setFill(Color.WHITE);
+        goalRightPost.setStroke(Color.LIGHTGRAY);
+        goalRightPost.setStrokeWidth(1);
+        gamePane.getChildren().add(goalRightPost);
+
+        // Vẽ lưới khung thành chi tiết hơn
+        for (int i = 0; i <= this.goalWidth; i += 15) {
+            Line verticalLine = new Line(this.goalX + i, this.goalY + 5, this.goalX + i, this.goalY + this.goalHeight);
+            verticalLine.setStroke(Color.web("#cccccc"));
+            verticalLine.setStrokeWidth(0.5);
+            verticalLine.setOpacity(0.7);
             gamePane.getChildren().add(verticalLine);
         }
-        for (int i = 10; i <= 60; i += 10) {
-            Line horizontalLine = new Line(paneWidth / 2 - 95, i + 20, paneWidth / 2 + 95, i + 20);
-            horizontalLine.setStroke(Color.WHITE);
-            horizontalLine.setStrokeWidth(1);
+        for (int i = 5; i <= this.goalHeight; i += 15) {
+            Line horizontalLine = new Line(this.goalX + 5, this.goalY + i, this.goalX + this.goalWidth - 5, this.goalY + i);
+            horizontalLine.setStroke(Color.web("#cccccc"));
+            horizontalLine.setStrokeWidth(0.5);
+            horizontalLine.setOpacity(0.7);
             gamePane.getChildren().add(horizontalLine);
         }
 
@@ -176,8 +230,10 @@ public class GameRoomController {
         goalkeeper = createPlayer(paneWidth / 2, 100, Color.RED, "/assets/goalkeeper_head.jpg");
         gamePane.getChildren().add(goalkeeper);
 
-        // Vẽ bóng với họa tiết đen trắng
-        ball = createBall(paneWidth / 2, paneHeight - 120, 10);
+        // Vẽ bóng với họa tiết đen trắng và lưu vị trí ban đầu
+        this.ballStartX = paneWidth / 2;
+        this.ballStartY = paneHeight - 120;
+        ball = createBall(this.ballStartX, this.ballStartY, 10);
         gamePane.getChildren().add(ball);
 
         // Hình ảnh thắng
@@ -196,7 +252,7 @@ public class GameRoomController {
         winText.setX(imageView.getX() + 25); // Đặt vị trí ngang giống ImageView
         winText.setY(imageView.getY() + imageView.getFitHeight() + 30); // Đặt vị trí ngay bên dưới hình ảnh
 
-        Text winText2 = new Text("Glory Man United!");
+        Text winText2 = new Text("messi muôn năm!");
         winText2.setFill(Color.YELLOW);
         winText2.setFont(Font.font("Arial", FontWeight.BOLD, 24)); // Tăng kích thước phông chữ
         winText2.setX(imageView.getX() + 5); // Đặt vị trí ngang giống ImageView
@@ -351,62 +407,91 @@ public class GameRoomController {
     public void animateShootVao(String directShoot, String directKeeper) {
         siuuuuuu.play();
         Platform.runLater(() -> {
-            // Tạo đường đi cho bóng
+            // Sử dụng tọa độ đã lưu từ drawField()
+            double paneWidth = gamePane.getWidth() > 0 ? gamePane.getWidth() : 700;
+            double paneHeight = gamePane.getHeight() > 0 ? gamePane.getHeight() : 500;
+            
+            // Tạo đường đi cho bóng - sử dụng vị trí ban đầu của bóng
             Path path = new Path();
-            path.getElements().add(new MoveTo(ballCircle.getCenterX(), ballCircle.getCenterY()));
+            path.getElements().add(new MoveTo(this.ballStartX, this.ballStartY));
 
-            double targetX = ballCircle.getCenterX();
-            double targetY = ballCircle.getCenterY() - 210;
+            // Tính toán vị trí bóng TRONG KHUNG THÀNH
+            double targetX = this.goalX + this.goalWidth / 2; // Mặc định giữa
+            double targetY = this.goalY + this.goalHeight / 2; // Giữa khung thành theo chiều dọc
             
             String direction = directShoot.trim().toLowerCase();
 
+            // Tính toán vị trí ngang (LEFT/MIDDLE/RIGHT) - TRONG KHUNG THÀNH
+            // Cộng thêm 5 để tránh cột khung thành (vì cột rộng 5px)
             if (direction.equals("left") || direction.equals("left high") || direction.equals("left low")) {
-                targetX -= 90;
+                targetX = this.goalX + 10 + (this.goalWidth - 15) * 0.3; // Trái, tránh cột
             } else if (direction.equals("right") || direction.equals("right high") || direction.equals("right low")) {
-                targetX += 90;
+                targetX = this.goalX + 10 + (this.goalWidth - 15) * 0.7; // Phải, tránh cột
+            } else {
+                targetX = this.goalX + this.goalWidth / 2; // Chính giữa
             }
             
-            // Điều chỉnh độ cao cho High/Low
+            // Điều chỉnh độ cao (HIGH/MIDDLE/LOW) - TRONG KHUNG THÀNH
+            // Cộng thêm 5 để tránh xà ngang (vì xà cao 5px)
             if (direction.contains("high")) {
-                targetY -= 30; // Cao hơn
+                targetY = this.goalY + 10 + (this.goalHeight - 10) * 0.3; // Cao, cách xà ngang
             } else if (direction.contains("low")) {
-                targetY += 30; // Thấp hơn
+                targetY = this.goalY + 10 + (this.goalHeight - 10) * 0.75; // Thấp, gần đất
+            } else {
+                targetY = this.goalY + 10 + (this.goalHeight - 10) * 0.5; // Giữa
             }
 
             path.getElements().add(new LineTo(targetX, targetY));
 
-            // Tạo animation cho bóng
+            // Tạo animation cho bóng với hiệu ứng đẹp hơn
             PathTransition pathTransition = new PathTransition();
-            pathTransition.setDuration(Duration.seconds(1));
+            pathTransition.setDuration(Duration.seconds(0.8));
             pathTransition.setPath(path);
             pathTransition.setNode(ball);
             pathTransition.play();
 
-            // Tạo animation cho thủ môn
+            // Tạo animation cho thủ môn (cố gắng cứu nhưng không kịp)
             double targetKeeperX = 0;
             double targetKeeperY = 0;
             String keeperDir = directKeeper.trim().toLowerCase();
             
             if (keeperDir.equals("left") || keeperDir.equals("left high") || keeperDir.equals("left low")) {
-                targetKeeperX = -90;
+                targetKeeperX = -60;
             } else if (keeperDir.equals("right") || keeperDir.equals("right high") || keeperDir.equals("right low")) {
-                targetKeeperX = 90;
+                targetKeeperX = 60;
             }
             
             // Điều chỉnh độ cao cho High/Low
             if (keeperDir.contains("high")) {
-                targetKeeperY = -20; // Nhảy cao hơn
+                targetKeeperY = -25; // Nhảy cao
             } else if (keeperDir.contains("low")) {
-                targetKeeperY = 20; // Cúi thấp hơn
+                targetKeeperY = 15; // Cúi thấp
             }
 
-            TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(1), goalkeeper);
+            TranslateTransition translateTransition = new TranslateTransition(Duration.seconds(0.8), goalkeeper);
             translateTransition.setByX(targetKeeperX);
             translateTransition.setByY(targetKeeperY);
             translateTransition.play();
 
+            // Hiển thị text "GOAL!" khi bóng vào lưới
+            pathTransition.setOnFinished(e -> {
+                Text goalText = new Text("GOAL! ⚽");
+                goalText.setFill(Color.YELLOW);
+                goalText.setFont(Font.font("Arial", FontWeight.BOLD, 48));
+                goalText.setX(paneWidth / 2 - 100);
+                goalText.setY(paneHeight / 2);
+                goalText.setStroke(Color.RED);
+                goalText.setStrokeWidth(2);
+                gamePane.getChildren().add(goalText);
+                
+                // Xóa text sau 1 giây
+                PauseTransition removeText = new PauseTransition(Duration.seconds(1));
+                removeText.setOnFinished(evt -> gamePane.getChildren().remove(goalText));
+                removeText.play();
+            });
+
             // Tạo một khoảng chờ 2 giây trước khi reset vị trí
-            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(2));
+            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(2.5));
             pauseTransition.setOnFinished(event -> {
                 // Đặt lại vị trí của quả bóng và thủ môn ngay lập tức
                 ball.setTranslateX(0);
@@ -423,81 +508,108 @@ public class GameRoomController {
 
     public void animateShootKhongVao(String directShoot, String directKeeper) {
         Platform.runLater(() -> {
-            // Tạo đường đi cho bóng
+            // Sử dụng tọa độ đã lưu từ drawField()
+            double paneWidth = gamePane.getWidth() > 0 ? gamePane.getWidth() : 700;
+            double paneHeight = gamePane.getHeight() > 0 ? gamePane.getHeight() : 500;
+            
+            // Tạo đường đi cho bóng đến vị trí sút - sử dụng vị trí ban đầu
             Path path = new Path();
-            path.getElements().add(new MoveTo(ballCircle.getCenterX(), ballCircle.getCenterY()));
+            path.getElements().add(new MoveTo(this.ballStartX, this.ballStartY));
 
-            double targetX = ballCircle.getCenterX();
-            double targetY = ballCircle.getCenterY() - 210;
+            // Tính toán vị trí bóng sẽ tới (giống như animateShootVao)
+            double targetX = this.goalX + this.goalWidth / 2;
+            double targetY = this.goalY + this.goalHeight / 2;
             
             String direction = directShoot.trim().toLowerCase();
 
+            // Tính toán vị trí ngang - TRONG KHUNG THÀNH, tránh cột
             if (direction.equals("left") || direction.equals("left high") || direction.equals("left low")) {
-                targetX -= 90;
+                targetX = this.goalX + 10 + (this.goalWidth - 15) * 0.3; // Trái
             } else if (direction.equals("right") || direction.equals("right high") || direction.equals("right low")) {
-                targetX += 90;
+                targetX = this.goalX + 10 + (this.goalWidth - 15) * 0.7; // Phải
+            } else {
+                targetX = this.goalX + this.goalWidth / 2; // Giữa
             }
             
-            // Điều chỉnh độ cao cho High/Low
+            // Điều chỉnh độ cao - TRONG KHUNG THÀNH, tránh xà
             if (direction.contains("high")) {
-                targetY -= 30; // Cao hơn
+                targetY = this.goalY + 10 + (this.goalHeight - 10) * 0.3; // Cao
             } else if (direction.contains("low")) {
-                targetY += 30; // Thấp hơn
+                targetY = this.goalY + 10 + (this.goalHeight - 10) * 0.75; // Thấp
+            } else {
+                targetY = this.goalY + 10 + (this.goalHeight - 10) * 0.5; // Giữa
             }
 
             // Bóng đi đến vị trí sút
             path.getElements().add(new LineTo(targetX, targetY));
 
-            // Đường đi ra ngoài nếu bị đẩy ra
+            // Đường đi ra ngoài khi bị thủ môn đẩy
             double targetPathOutX = targetX;
-            double targetPathOutY = targetY - 25;
+            double targetPathOutY = targetY - 30;
             String keeperDir2 = directKeeper.trim().toLowerCase();
             
             if (keeperDir2.equals("left") || keeperDir2.equals("left high") || keeperDir2.equals("left low")) {
-                targetPathOutX -= 40;
+                targetPathOutX -= 50;
             } else if (keeperDir2.equals("right") || keeperDir2.equals("right high") || keeperDir2.equals("right low")) {
-                targetPathOutX += 40;
+                targetPathOutX += 50;
             } else {
-                targetPathOutY -= 40;
+                targetPathOutY -= 50;
             }
+            
             Path pathOut = new Path();
             pathOut.getElements().add(new MoveTo(targetX, targetY));
             pathOut.getElements().add(new LineTo(targetPathOutX, targetPathOutY));
 
             // Tạo animation cho bóng đi đến khung thành
-            PathTransition pathTransitionToGoal = new PathTransition(Duration.seconds(0.9), path, ball);
+            PathTransition pathTransitionToGoal = new PathTransition(Duration.seconds(0.7), path, ball);
 
-            // Tạo animation cho bóng bị đẩy ra ngoài (chỉ khi chặn được)
-            PathTransition pathTransitionOut = new PathTransition(Duration.seconds(0.3), pathOut, ball);
+            // Tạo animation cho bóng bị đẩy ra ngoài
+            PathTransition pathTransitionOut = new PathTransition(Duration.seconds(0.4), pathOut, ball);
 
-            // Tạo animation cho thủ môn
+            // Tạo animation cho thủ môn (cản được bóng)
             double targetKeeperX = 0;
             double targetKeeperY = 0;
             String keeperDir = directKeeper.trim().toLowerCase();
             
             if (keeperDir.equals("left") || keeperDir.equals("left high") || keeperDir.equals("left low")) {
-                targetKeeperX = -90;
+                targetKeeperX = -60;
             } else if (keeperDir.equals("right") || keeperDir.equals("right high") || keeperDir.equals("right low")) {
-                targetKeeperX = 90;
+                targetKeeperX = 60;
             }
             
-            // Điều chỉnh độ cao cho High/Low
             if (keeperDir.contains("high")) {
-                targetKeeperY = -20; // Nhảy cao hơn
+                targetKeeperY = -25;
             } else if (keeperDir.contains("low")) {
-                targetKeeperY = 20; // Cúi thấp hơn
+                targetKeeperY = 15;
             }
 
-            TranslateTransition goalkeeperMove = new TranslateTransition(Duration.seconds(1), goalkeeper);
+            TranslateTransition goalkeeperMove = new TranslateTransition(Duration.seconds(0.7), goalkeeper);
             goalkeeperMove.setByX(targetKeeperX);
             goalkeeperMove.setByY(targetKeeperY);
             goalkeeperMove.setAutoReverse(false);
+
+            // Hiển thị text "SAVED!" khi thủ môn cản được
+            pathTransitionToGoal.setOnFinished(e -> {
+                Text savedText = new Text("SAVED! 🧤");
+                savedText.setFill(Color.LIGHTBLUE);
+                savedText.setFont(Font.font("Arial", FontWeight.BOLD, 42));
+                savedText.setX(paneWidth / 2 - 110);
+                savedText.setY(paneHeight / 2);
+                savedText.setStroke(Color.BLUE);
+                savedText.setStrokeWidth(2);
+                gamePane.getChildren().add(savedText);
+                
+                // Xóa text sau 1 giây
+                PauseTransition removeText = new PauseTransition(Duration.seconds(1));
+                removeText.setOnFinished(evt -> gamePane.getChildren().remove(savedText));
+                removeText.play();
+            });
 
             PauseTransition pause = new PauseTransition(Duration.seconds(2));
 
             // Kết hợp các animations
             SequentialTransition ballAnimation;
-            // Sử dụng phương thức so sánh tương tự như server
+            // Bóng bay đến khung thành, sau đó bị đẩy ra
             String shootDir = directShoot.trim().toLowerCase();
             String keeperDir3 = directKeeper.trim().toLowerCase();
             boolean directionsMatch = shootDir.equals(keeperDir3) ||
@@ -765,8 +877,8 @@ public class GameRoomController {
     }
 
     private void playBackgroundMusic() {
-        siuuuuuu = new AudioClip(getClass().getResource("/sound/siuuu.wav").toExternalForm());
-        mu = new AudioClip(getClass().getResource("/sound/mu.wav").toExternalForm());
+        siuuuuuu = new AudioClip(getClass().getResource("/sound/nhac-nen.wav").toExternalForm());
+        mu = new AudioClip(getClass().getResource("/sound/goal.wav").toExternalForm());
         mu.setCycleCount(AudioClip.INDEFINITE); // Set to loop indefinitely
         mu.setVolume(0.15f); // Set volume to 50%
         mu.play();// Play the music

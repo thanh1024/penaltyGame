@@ -44,7 +44,9 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             while (isRunning) {
+                System.out.println("[DEBUG SERVER] Waiting for message from client...");
                 Message message = (Message) in.readObject();
+                System.out.println("[DEBUG SERVER] Received message: " + (message != null ? message.getType() : "null"));
                 if (message != null) {
                     handleMessage(message);
                 }
@@ -77,6 +79,9 @@ public class ClientHandler implements Runnable {
 
     private void handleMessage(Message message) throws IOException, SQLException {
         switch (message.getType()) {
+            case "register":
+                handleRegister(message);
+                break;
             case "login":
                 handleLogin(message);
                 break;
@@ -171,6 +176,32 @@ public class ClientHandler implements Runnable {
         boolean playAgain = (boolean) message.getContent();
         if (gameRoom != null) {
             gameRoom.handlePlayAgainResponse(playAgain, this);
+        }
+    }
+    
+    private void handleRegister(Message message) throws IOException, SQLException {
+        System.out.println("[DEBUG SERVER] Received register message");
+        String[] credentials = (String[]) message.getContent();
+        String username = credentials[0];
+        String password = credentials[1];
+        System.out.println("[DEBUG SERVER] Register attempt - Username: " + username);
+        
+        try {
+            System.out.println("[DEBUG SERVER] Calling dbManager.registerUser()");
+            boolean success = dbManager.registerUser(username, password);
+            System.out.println("[DEBUG SERVER] Registration result: " + success);
+            
+            if (success) {
+                sendMessage(new Message("register_success", "Đăng ký thành công! Vui lòng đăng nhập."));
+                System.out.println("[DEBUG SERVER] Sent register_success to client for: " + username);
+            } else {
+                sendMessage(new Message("register_error", "Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác."));
+                System.out.println("[DEBUG SERVER] Sent register_error - username exists");
+            }
+        } catch (SQLException e) {
+            System.err.println("[ERROR SERVER] SQLException during registration: " + e.getMessage());
+            sendMessage(new Message("register_error", "Lỗi server khi đăng ký. Vui lòng thử lại."));
+            e.printStackTrace();
         }
     }
 

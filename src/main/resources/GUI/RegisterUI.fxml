@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="CENTER" spacing="25.0" prefWidth="450" prefHeight="550" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="client.GUI.RegisterController" 
+      style="-fx-background-color: linear-gradient(to bottom, #1a472a, #0d2818); -fx-padding: 40;">
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
+    
+    <!-- Title Section -->
+    <VBox alignment="CENTER" spacing="10">
+        <Label text="⚽ PENALTY SHOOTOUT ⚽" style="-fx-font-size: 32px; -fx-text-fill: #ffd700; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 10, 0, 0, 3);"/>
+        <Label text="Đăng Ký Tài Khoản" style="-fx-font-size: 22px; -fx-text-fill: #ffffff; -fx-font-weight: bold;"/>
+        <Separator prefWidth="300" style="-fx-background-color: #3d7a4d;"/>
+    </VBox>
+    
+    <!-- Register Form -->
+    <VBox alignment="CENTER" spacing="15" style="-fx-background-color: rgba(45, 90, 61, 0.5); -fx-background-radius: 15; -fx-padding: 30; -fx-border-color: #3d7a4d; -fx-border-width: 2; -fx-border-radius: 15;">
+        <Label text="👤 Tên đăng nhập" style="-fx-font-size: 14px; -fx-text-fill: #ffffff;"/>
+        <TextField fx:id="usernameField" promptText="Nhập tên đăng nhập" prefWidth="280" prefHeight="40"
+                   style="-fx-font-size: 15px;"/>
+        
+        <Label text="🔒 Mật khẩu" style="-fx-font-size: 14px; -fx-text-fill: #ffffff;"/>
+        <PasswordField fx:id="passwordField" promptText="Nhập mật khẩu" prefWidth="280" prefHeight="40"
+                       style="-fx-font-size: 15px;"/>
+        
+        <Button text="⚡ ĐĂNG KÝ ⚡" onAction="#handleRegister" prefWidth="280" prefHeight="45"
+                style="-fx-font-size: 16px; -fx-background-color: linear-gradient(to bottom, #4CAF50, #2e7d32); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"/>
+    </VBox>
+    
+    <Label fx:id="errorLabel" textFill="#ff4444" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 1);"/>
+    
+    <!-- Back to Login Button -->
+    <HBox alignment="CENTER" spacing="10">
+        <Button text="Đăng nhập ngay" onAction="#handleBackToLogin" 
+                style="-fx-font-size: 13px; -fx-background-color: transparent; -fx-text-fill: #ffd700; -fx-underline: true; -fx-cursor: hand; -fx-font-weight: bold;"/>
+    </HBox>
+    
+    <!-- Footer -->
+    <Label text="Tạo tài khoản để tham gia thi đấu!" style="-fx-font-size: 12px; -fx-text-fill: #90ee90; -fx-font-style: italic;"/>
+</VBox>

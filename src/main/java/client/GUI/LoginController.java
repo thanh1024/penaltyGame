@@ -33,6 +33,12 @@ public class LoginController {
         Message loginMessage = new Message("login", credentials);
         client.sendMessage(loginMessage);
     }
+    
+    @FXML
+    private void handleRegister() throws IOException {
+        // Thông báo cho client chuyển sang màn hình đăng ký
+        client.showRegisterUI();
+    }
 
     public void showError(String error) {
         Platform.runLater(() -> {
