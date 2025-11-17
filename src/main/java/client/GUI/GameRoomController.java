@@ -877,8 +877,9 @@ public class GameRoomController {
     }
 
     private void playBackgroundMusic() {
-        siuuuuuu = new AudioClip(getClass().getResource("/sound/nhac-nen.wav").toExternalForm());
-        mu = new AudioClip(getClass().getResource("/sound/goal.wav").toExternalForm());
+        siuuuuuu = new AudioClip(getClass().getResource("/sound/siuuu.wav").toExternalForm());
+        siuuuuuu.setVolume(0.8f);
+        mu = new AudioClip(getClass().getResource("/sound/mu.wav").toExternalForm());
         mu.setCycleCount(AudioClip.INDEFINITE); // Set to loop indefinitely
         mu.setVolume(0.15f); // Set volume to 50%
         mu.play();// Play the music
